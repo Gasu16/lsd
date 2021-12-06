@@ -265,6 +265,7 @@ fn get_output<'a>(
         };
 
         match block {
+            Block::Count => block_vec.push(meta.count.render(colors)),
             Block::INode => block_vec.push(meta.inode.render(colors)),
             Block::Links => block_vec.push(meta.links.render(colors)),
             Block::Permission => {

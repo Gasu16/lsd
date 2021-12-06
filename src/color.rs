@@ -60,6 +60,10 @@ pub enum Elem {
         valid: bool,
     },
 
+    Count {
+        valid: bool,
+    },
+
     TreeEdge,
 }
 
@@ -117,6 +121,9 @@ impl Elem {
 
             Elem::INode { valid: false } => theme.inode.valid,
             Elem::INode { valid: true } => theme.inode.invalid,
+
+            Elem::Count { valid: false } => theme.count.valid,
+            Elem::Count { valid: true } => theme.count.invalid,
 
             Elem::TreeEdge => theme.tree_edge,
             Elem::Links { valid: false } => theme.links.invalid,
@@ -224,6 +231,10 @@ impl Colors {
                 false => Some("no"),
             },
             Elem::Links { valid } => match valid {
+                true => Some("so"),
+                false => Some("no"),
+            },
+            Elem::Count { valid } => match valid {
                 true => Some("so"),
                 false => Some("no"),
             },
@@ -375,6 +386,10 @@ mod elem {
             links: theme::Links {
                 valid: Color::AnsiValue(13),    // Pink
                 invalid: Color::AnsiValue(245), // Grey
+            },
+            count: theme::Count {
+                valid: Color::AnsiValue(35),
+                invalid: Color::AnsiValue(245),
             },
             tree_edge: Color::AnsiValue(245), // Grey
         }

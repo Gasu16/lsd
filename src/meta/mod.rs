@@ -8,6 +8,7 @@ mod owner;
 mod permissions;
 mod size;
 mod symlink;
+pub mod count;
 
 #[cfg(windows)]
 mod windows_utils;
@@ -22,6 +23,7 @@ pub use self::owner::Owner;
 pub use self::permissions::Permissions;
 pub use self::size::Size;
 pub use self::symlink::SymLink;
+pub use self::count::Count;
 pub use crate::icon::Icons;
 
 use crate::flags::{Display, Flags, Layout};
@@ -43,6 +45,7 @@ pub struct Meta {
     pub indicator: Indicator,
     pub inode: INode,
     pub links: Links,
+    pub count: Count,
     pub content: Option<Vec<Meta>>,
 }
 
@@ -231,8 +234,9 @@ impl Meta {
         let name = Name::new(path, file_type);
         let inode = INode::from(&metadata);
         let links = Links::from(&metadata);
-
+        let count = Count::from(&metadata);
         Ok(Self {
+            count,
             inode,
             links,
             path: path.to_path_buf(),

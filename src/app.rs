@@ -33,6 +33,12 @@ pub fn build() -> App<'static, 'static> {
                 .help("When to use terminal colours"),
         )
         .arg(
+            Arg::with_name("count")
+                .long("count")
+                .multiple(true)
+                .help("Count how many files are listed"),
+        )
+        .arg(
             Arg::with_name("icon")
                 .long("icon")
                 .possible_value("always")

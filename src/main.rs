@@ -100,7 +100,7 @@ fn main() {
         .expect("failed to retrieve cli value")
         .map(PathBuf::from)
         .collect();
-
+        
     let config = if matches.is_present("ignore-config") {
         Config::with_none()
     } else if matches.is_present("config-file") {

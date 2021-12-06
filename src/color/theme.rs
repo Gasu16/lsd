@@ -22,6 +22,7 @@ pub struct Theme {
     pub inode: INode,
     pub tree_edge: Color,
     pub links: Links,
+    pub count: Count,
 
     #[serde(skip)]
     pub file_type: FileType,
@@ -102,6 +103,14 @@ pub struct Size {
 #[serde(rename_all = "kebab-case")]
 #[serde(deny_unknown_fields)]
 pub struct INode {
+    pub valid: Color,
+    pub invalid: Color,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+#[serde(deny_unknown_fields)]
+pub struct Count {
     pub valid: Color,
     pub invalid: Color,
 }
@@ -225,6 +234,10 @@ impl Theme {
                 valid: Color::AnsiValue(13),    // Pink
                 invalid: Color::AnsiValue(245), // Grey
             },
+            count: Count {
+                valid: Color::AnsiValue(55),
+                invalid: Color::AnsiValue(245),
+            },
             links: Links {
                 valid: Color::AnsiValue(13),    // Pink
                 invalid: Color::AnsiValue(245), // Grey
@@ -255,6 +268,9 @@ size:
   large: 172
 inode:
   valid: 13
+  invalid: 245
+count:
+  valid: 55
   invalid: 245
 links:
   valid: 13

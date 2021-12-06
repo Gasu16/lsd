@@ -3,11 +3,15 @@
 
 use crate::config_file::Config;
 use crate::print_error;
+//pub mod count;
+//use crate::meta::count;
 
+//questo no: use crate::flags::Block::Count;
 use std::convert::TryFrom;
-
+//use crate::flags::Block::Count;
 use clap::{ArgMatches, Error, ErrorKind};
-
+//use crate::meta::name::DisplayOption;
+//use crate::meta::{FileType, Meta};
 /// A struct to hold a [Vec] of [Block]s and to provide methods to create it.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Blocks(pub Vec<Block>);
@@ -35,6 +39,7 @@ impl Blocks {
             Ok(Default::default())
         };
 
+
         if matches.is_present("long") && !matches.is_present("ignore-config") {
             if let Some(value) = Self::from_config(config) {
                 result = Ok(value);
@@ -51,7 +56,14 @@ impl Blocks {
             }
         }
 
-        result
+        if matches.is_present("count") {
+            if let Ok(blocks) = result.as_mut() {
+                blocks.count_files_dirs();
+            }
+            
+        }
+
+       result
     }
 
     /// Get a potential `Blocks` struct from [ArgMatches].
@@ -127,6 +139,14 @@ impl Blocks {
         ])
     }
 
+    /// Counts how many files and directories are present in the given path
+    
+    fn count_files_dirs(&mut self) {
+        if !self.0.contains(&Block::Count) {
+            self.0.insert(0, Block::Count);
+        }
+    }
+
     /// Checks whether `self` already contains a [Block] of variant [INode](Block::INode).
     fn contains_inode(&self) -> bool {
         self.0.contains(&Block::INode)
@@ -141,7 +161,7 @@ impl Blocks {
     /// Block of that variant.
     fn optional_prepend_inode(&mut self) {
         if !self.contains_inode() {
-            self.prepend_inode()
+            self.prepend_inode();
         }
     }
 }
@@ -165,6 +185,7 @@ pub enum Block {
     Name,
     INode,
     Links,
+    Count,
 }
 
 impl TryFrom<&str> for Block {
@@ -181,6 +202,7 @@ impl TryFrom<&str> for Block {
             "name" => Ok(Self::Name),
             "inode" => Ok(Self::INode),
             "links" => Ok(Self::Links),
+            "count" => Ok(Self::Count),
             _ => Err(format!("Not a valid block name: {}", &string)),
         }
     }
@@ -211,6 +233,16 @@ mod test_blocks {
                 &$right
             )
         };
+    }
+
+    #[test]
+    fn test_configure_from_count() {
+        let argv = vec!["lsd", "--count"];
+        let target = Ok::<_, Error>(Blocks::count_files_dirs());
+        let matches = app::build().get_matches_from_safe(argv).unwrap();
+        let result = Blocks::configure_from(&matches, &Config::with_none());
+        
+        assert_eq_ok!(result, target);
     }
 
     #[test]

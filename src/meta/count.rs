@@ -3,18 +3,22 @@ use std::fs::Metadata;
 
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
-pub struct INode {
+pub struct Count {
     index: Option<u64>,
+    indice: i64,
 }
 
-impl<'a> From<&'a Metadata> for INode {
+
+impl<'a> From<&'a Metadata> for Count {
 
     #[cfg(unix)]
     fn from(meta: &Metadata) -> Self {
-        use std::os::unix::fs::MetadataExt;   
+        use std::os::unix::fs::MetadataExt; 
+        //println!("Sono in count.rs");
         let index = meta.ino();
-        //println!("Sono in inode.rs");
-        Self { index: Some(index) }
+        static mut INDICE: i64 = -1;
+        unsafe {INDICE += 1};
+        Self { index: Some(index), indice: unsafe {INDICE} }
     }
 
     #[cfg(windows)]
@@ -24,12 +28,13 @@ impl<'a> From<&'a Metadata> for INode {
 }
 
         
-impl INode {
+impl Count {
 
     pub fn render(&self, colors: &Colors) -> ColoredString {
+        
         match self.index {
-            Some(i) => colors.colorize(i.to_string(), &Elem::INode { valid: true }),
-            None => colors.colorize(String::from("-"), &Elem::INode { valid: false }),
+            Some(_i) => colors.colorize(self.indice.to_string(), &Elem::Count { valid: true }),
+            None => colors.colorize(String::from("-"), &Elem::Count { valid: false }),
         }
     }
 }
@@ -37,7 +42,7 @@ impl INode {
 #[cfg(test)]
 #[cfg(unix)]
 mod tests {
-    use super::INode;
+    use super::Count;
     use std::env;
     use std::io;
     use std::path::Path;
@@ -48,18 +53,18 @@ mod tests {
     }
 
     #[test]
-    fn test_inode_no_zero() {
+    fn test_count_no_zero() {
         let mut file_path = env::temp_dir();
-        file_path.push("inode.tmp");
+        file_path.push("count.tmp");
 
         let success = cross_platform_touch(&file_path).unwrap().success();
         assert!(success, "failed to exec touch");
 
-        let inode = INode::from(&file_path.metadata().unwrap());
+        let count = Count::from(&file_path.metadata().unwrap());
 
         #[cfg(unix)]
-        assert!(inode.index.is_some());
+        assert!(count.index.is_some());
         #[cfg(windows)]
-        assert!(inode.index.is_none());
+        assert!(count.index.is_none());
     }
 }

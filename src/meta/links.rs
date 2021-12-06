@@ -12,7 +12,7 @@ impl<'a> From<&'a Metadata> for Links {
         use std::os::unix::fs::MetadataExt;
 
         let nlink = meta.nlink();
-
+        
         Self { nlink: Some(nlink) }
     }
 
